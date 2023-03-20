@@ -26,6 +26,9 @@ jobs:
           coq_version: ${{ matrix.coq-version }}
           custom_script: |
             eval $(opam env)
+            opam switch
+            opam list
+            uname -a
             sudo chmod -R a=u .
             cd coq
             ./configure -local
