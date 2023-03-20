@@ -16,7 +16,7 @@ jobs:
         camlp-flag: [ '-usecamlp5' ]
         include:
         - camlp5-version: ''
-          camlp-flag: [ '-usecamlp4' ]
+          camlp-flag: '-usecamlp4'
 
     runs-on: ubuntu-latest
 
