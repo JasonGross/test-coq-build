@@ -28,7 +28,7 @@ jobs:
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: ${{ env.ocaml-version }}
+          ocaml-compiler: ${{ matrix.ocaml-version }}
       - name: Install OCaml deps
         run: |
           pushd /tmp # work around https://github.com/ocaml/setup-ocaml/issues/207
