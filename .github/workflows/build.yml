@@ -27,6 +27,7 @@ jobs:
             opam switch
             opam list
             uname -a
+            readlink -f /bin/sh
             sudo chmod -R a=u .
             cd coq
             ./configure -local
