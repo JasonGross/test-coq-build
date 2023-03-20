@@ -1,0 +1,52 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        - ocaml-version: [ 3.10.2 , 3.12.1 , 4.02.1 , 4.02.3 , 4.06.1 , 4.08 ]
+        - camlp5-version: [ '<8' , '<7', '<7.12', '=6.04' , '=6.06' , '=6.07' , '=6.11', '=6.12', '=6.13' , '=6.14' , '=6.15', '=6.16' , '=6.17' ]
+        - camlp-flag: [ '-usecamlp5' ]
+        include:
+        - camlp5-version: ''
+          camlp-flag: [ '-usecamlp4' ]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ env.ocaml-version }}
+      - name: Install OCaml deps
+        run: |
+          pushd /tmp # work around https://github.com/ocaml/setup-ocaml/issues/207
+          echo "::group::opam update"
+          opam update
+          echo "::endgroup::"
+          echo "::group::opam install"
+          opam install -y "camlp5${{ matrix.camlp5-version }}" camlp4 ocamlfind hevea num zarith || true
+          echo "::endgroup::"
+          echo "::group::opam switch"
+          opam switch
+          echo "::endgroup::"
+          echo "::group::opam list"
+          opam list
+          echo "::endgroup::"
+          popd
+      - name: Build Coq
+        run: |
+          eval $(opam env)
+          cd coq
+          ./configure -local ${{ matrix.camlp-flag }}
+          make TIMED=1
